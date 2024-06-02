@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monster Grid Game</title>
+<style>
+  /* Basic styles for the game grid */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(10, 50px);
+    grid-template-rows: repeat(10, 50px);
+  }
+  .cell {
+    width: 50px;
+    height: 50px;
+    border: 1px solid black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vampire { background-color: red; }
+  .werewolf { background-color: blue; }
+  .ghost { background-color: green; }
+</style>
+</head>
+<body>
+<h1>Monster Grid Game</h1>
+<div id="grid"></div>
+<div>
+  <h3>Player Stats</h3>
+  <p>Wins: <span id="wins">0</span></p>
+  <p>Losses: <span id="losses">0</span></p>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  const gridElement = document.getElementById('grid');
+
+  function createGrid() {
+    for (let i = 0; i < 10; i++) {
+      for (let j = 0; j < 10; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.dataset.x = i;
+        cell.dataset.y = j;
+        cell.addEventListener('click', () => {
+          // Handle cell click event
+        });
+        gridElement.appendChild(cell);
+      }
+    }
+  }
+
+  function updateGrid(grid) {
+    gridElement.childNodes.forEach((cell, index) => {
+      const x = Math.floor(index / 10);
+      const y = index % 10;
+      cell.className = 'cell';
+      if (grid[x][y]) {
+        cell.classList.add(grid[x][y]);
+      }
+    });
+  }
+
+  socket.on('gameJoined', (game) => {
+    updateGrid(game.grid);
+  });
+
+  socket.on('updateGrid', (grid) => {
+    updateGrid(grid);
+  });
+
+  createGrid();
+</script>
+</body>
+</html>
