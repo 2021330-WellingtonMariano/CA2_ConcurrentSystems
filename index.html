@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Monster Grid Game</title>
 <style>
-  /* Basic styles for the game grid */
   #grid {
     display: grid;
     grid-template-columns: repeat(10, 50px);
@@ -32,6 +31,9 @@
   <p>Wins: <span id="wins">0</span></p>
   <p>Losses: <span id="losses">0</span></p>
 </div>
+<button id="vampire">Place Vampire</button>
+<button id="werewolf">Place Werewolf</button>
+<button id="ghost">Place Ghost</button>
 <script src="/socket.io/socket.io.js"></script>
 <script>
   const socket = io();
@@ -47,6 +49,16 @@
         cell.dataset.y = j;
         cell.addEventListener('click', () => {
           // Handle cell click event
+          const x = parseInt(cell.dataset.x);
+          const y = parseInt(cell.dataset.y);
+
+          if (isPlacingMonster && selectedMonster) {
+            socket.emit('placeMonster', selectedMonster, x, y);
+            isPlacingMonster = false;
+            selectedMonster = null;
+          } else {
+            // Handle monster movement
+          }
         });
         gridElement.appendChild(cell);
       }
@@ -59,7 +71,7 @@
       const y = index % 10;
       cell.className = 'cell';
       if (grid[x][y]) {
-        cell.classList.add(grid[x][y]);
+        cell.classList.add(grid[x][y].type);
       }
     });
   }
@@ -72,7 +84,13 @@
     updateGrid(grid);
   });
 
+  socket.on('nextTurn', (playerId) => {
+    // Handle next turn logic
+  });
+
+  socket.on('gameWon', () => {
+    alert('You won the game!');
+  });
+
   createGrid();
-</script>
-</body>
-</html>
+
